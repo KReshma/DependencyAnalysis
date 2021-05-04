@@ -1,0 +1,36 @@
+plugins {
+    id 'java'
+}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+        }
+    }
+}
+configurations {
+
+    additionalLib
+}
+dependencies {
+    additionalLib  group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
+    configurations.compile.extendsFrom(configurations.additionalLib)
+}
+
+tasks.named('jar') {
+    manifest {
+        attributes('Implementation-Title': project.name,
+                'Implementation-Version': project.version,
+                'Main-Class': 'com.dependency.analysis.tool.DependencyAnalysis')
+    }
+    from {
+        configurations.additionalLib.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
